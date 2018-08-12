@@ -5,4 +5,3 @@ function SCModel(options) {
 }
 
 export default SCModel;
-console.log(333);

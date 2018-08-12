@@ -2,7 +2,7 @@
   "name": "sc-model",
   "version": "1.0.0",
   "description": "SocketCluster model component for the front end",
-  "main": "index.js",
+  "main": "sc-model.js",
   "dependencies": {
     "socketcluster-client-edge": "^13.0.2"
   },
