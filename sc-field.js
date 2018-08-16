@@ -6,8 +6,8 @@ function SCField(options) {
   Emitter.call(this);
 
   this.socket = options.socket;
-  this.resourceType = options.type;
-  this.resourceId = options.id;
+  this.resourceType = options.resourceType;
+  this.resourceId = options.resourceId;
   this.name = options.name;
 
   this.resourceChannelName = 'crud>' + this.resourceType + '/' + this.resourceId + '/' + this.name;
@@ -25,6 +25,8 @@ function SCField(options) {
 }
 
 SCField.prototype = Object.create(Emitter.prototype);
+
+SCField.Emitter = Emitter;
 
 SCField.prototype.loadData = function () {
   var query = {
