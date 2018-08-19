@@ -12,7 +12,24 @@ function SCField(options) {
 
   this.resourceChannelName = 'crud>' + this.resourceType + '/' + this.resourceId + '/' + this.name;
   this.channel = this.socket.subscribe(this.resourceChannelName);
-  this.channel.watch(this.watcher);
+
+  this._handleChannelData = (packet) => {
+    if (packet == null) {
+      this.loadData();
+    } else {
+      let oldValue = this.value;
+      if (packet.type === 'delete') {
+        this.value = null;
+        this.destroy();
+      } else {
+        this.value = packet.value;
+      }
+      this.loadedValue = this.value;
+      this._triggerValueChange(oldValue, this.value);
+    }
+  };
+
+  this.channel.watch(this._handleChannelData);
 
   // Fetch data once the subscribe is successful.
   this.channel.on('subscribe', () => {
@@ -28,8 +45,16 @@ SCField.prototype = Object.create(Emitter.prototype);
 
 SCField.Emitter = Emitter;
 
+SCField.prototype._triggerValueChange = function (oldValue, newValue) {
+  this.emit('change', {
+    field: this.name,
+    oldValue: oldValue,
+    newValue: newValue
+  });
+};
+
 SCField.prototype.loadData = function () {
-  var query = {
+  let query = {
     type: this.resourceType,
     id: this.resourceId,
     field: this.name
@@ -38,24 +63,12 @@ SCField.prototype.loadData = function () {
     if (err) {
       this.emit('error', err);
     } else {
+      let oldValue = this.value;
       this.value = result;
       this.loadedValue = result;
+      this._triggerValueChange(oldValue, this.value);
     }
   });
-};
-
-SCField.prototype.watcher = function () {
-  if (packet == null) {
-    this.loadData();
-  } else {
-    if (packet.type === 'delete') {
-      this.value = null;
-      this.destroy();
-    } else {
-      this.value = packet.value;
-    }
-    this.loadedValue = this.value;
-  }
 };
 
 SCField.prototype.resubscribe = function () {
@@ -70,8 +83,10 @@ SCField.prototype.save = function () {
 };
 
 SCField.prototype.update = function (newValue) {
+  let oldValue = this.value;
   this.value = newValue;
-  var query = {
+  this._triggerValueChange(oldValue, this.value);
+  let query = {
     type: this.resourceType,
     id: this.resourceId,
     field: this.name,
@@ -88,9 +103,11 @@ SCField.prototype.update = function (newValue) {
   });
 };
 
-SCField.prototype.delete = function (callback) {
+SCField.prototype.delete = function () {
+  let oldValue = this.value;
   this.value = null;
-  var query = {
+  this._triggerValueChange(oldValue, this.value);
+  let query = {
     type: this.resourceType,
     id: this.resourceId,
     field: this.name
@@ -108,7 +125,7 @@ SCField.prototype.delete = function (callback) {
 
 SCField.prototype.destroy = function () {
   this.socket.off('authenticate', this.resubscribe);
-  this.channel.unwatch(this.watcher);
+  this.channel.unwatch(this._handleChannelData);
   if (!this.channel.watchers().length) {
     this.channel.destroy();
   }

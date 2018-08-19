@@ -10,10 +10,16 @@ function SCModel(options) {
   this.type = options.type;
   this.id = options.id;
   this.fields = options.fields;
-  this.scFields = [];
+  this.scFields = {};
+  this.value = {};
 
   this._handleSCFieldError = (err) => {
     this.emit('error', err);
+  };
+
+  this._handleSCFieldChange = (event) => {
+    this.value[event.field] = event.newValue;
+    this.emit('change', event);
   };
 
   this.fields.forEach((field) => {
@@ -24,15 +30,33 @@ function SCModel(options) {
       name: field
     });
     scField.on('error', this._handleSCFieldError);
-    this.scFields.push(scField);
+    scField.on('change', this._handleSCFieldChange);
+    this.scFields[field] = scField;
   });
 }
 
 SCModel.prototype = Object.create(Emitter.prototype);
 
+SCModel.prototype.save = function () {
+  let promises = [];
+  Object.values(this.scFields).forEach((scField) => {
+    promises.push(scField.save());
+  });
+  return Promise.all(promises);
+};
+
+SCModel.prototype.update = function (field, newValue) {
+  return this.scFields[field].update(newValue);
+};
+
+SCModel.prototype.delete = function (field) {
+  return this.scFields[field].delete();
+};
+
 SCModel.prototype.destroy = function () {
-  this.scFields.forEach((scField) => {
+  Object.values(this.scFields).forEach((scField) => {
     scField.removeListener('error', this._handleSCFieldError);
+    scField.removeListener('change', this._handleSCFieldChange);
     scField.destroy();
   });
 };
