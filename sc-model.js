@@ -6,6 +6,8 @@ const Emitter = SCField.Emitter;
 // options.id:
 // options.fields:
 function SCModel(options) {
+  Emitter.call(this);
+
   this.socket = options.socket;
   this.type = options.type;
   this.id = options.id;
