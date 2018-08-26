@@ -9,6 +9,7 @@ function SCField(options) {
   this.resourceType = options.resourceType;
   this.resourceId = options.resourceId;
   this.name = options.name;
+  this.active = true;
 
   this.resourceChannelName = 'crud>' + this.resourceType + '/' + this.resourceId + '/' + this.name;
   this.channel = this.socket.subscribe(this.resourceChannelName);
@@ -124,6 +125,10 @@ SCField.prototype.delete = function () {
 };
 
 SCField.prototype.destroy = function () {
+  if (!this.active) {
+    return;
+  }
+  this.active = false;
   this.socket.off('authenticate', this.resubscribe);
   this.channel.unwatch(this._handleChannelData);
   if (!this.channel.watchers().length) {

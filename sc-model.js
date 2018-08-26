@@ -2,9 +2,9 @@ import SCField from './sc-field.js';
 const Emitter = SCField.Emitter;
 
 // options.socket: The SocketCluster client socket to use to sync the model state.
-// options.type:
-// options.id:
-// options.fields:
+// options.type: The resource type.
+// options.id: The resource id.
+// options.fields: An array of fields names required by this model.
 function SCModel(options) {
   Emitter.call(this);
 
@@ -13,7 +13,9 @@ function SCModel(options) {
   this.id = options.id;
   this.fields = options.fields;
   this.scFields = {};
-  this.value = {};
+  this.value = {
+    id: this.id
+  };
 
   this._handleSCFieldError = (err) => {
     this.emit('error', err);
@@ -54,6 +56,7 @@ SCModel.prototype.update = function (field, newValue) {
 };
 
 SCModel.prototype.delete = function (field) {
+  // TODO: if no field is provided, delete the whole resource.
   return this.scFields[field].delete();
 };
 
