@@ -37,6 +37,8 @@ function SCModel(options) {
 
 SCModel.prototype = Object.create(Emitter.prototype);
 
+SCModel.Emitter = Emitter;
+
 SCModel.prototype.save = function () {
   let promises = [];
   Object.values(this.scFields).forEach((scField) => {
