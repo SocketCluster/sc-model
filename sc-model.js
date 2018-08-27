@@ -52,12 +52,46 @@ SCModel.prototype.save = function () {
 };
 
 SCModel.prototype.update = function (field, newValue) {
-  return this.scFields[field].update(newValue);
+  if (this.scFields[field]) {
+    return this.scFields[field].update(newValue);
+  }
+  let query = {
+    type: this.type,
+    id: this.id,
+    field: field,
+    value: newValue
+  };
+  return new Promise((resolve, reject) => {
+    this.socket.emit('update', query, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
 };
 
 SCModel.prototype.delete = function (field) {
-  // TODO: if no field is provided, delete the whole resource.
-  return this.scFields[field].delete();
+  let query = {
+    type: this.type,
+    id: this.id
+  };
+  if (field != null) {
+    if (this.scFields[field]) {
+      return this.scFields[field].delete();
+    }
+    query.field = field;
+  }
+  return new Promise((resolve, reject) => {
+    this.socket.emit('delete', query, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
 };
 
 SCModel.prototype.destroy = function () {
