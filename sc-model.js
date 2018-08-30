@@ -23,7 +23,12 @@ function SCModel(options) {
 
   this._handleSCFieldChange = (event) => {
     this.value[event.field] = event.newValue;
-    this.emit('change', event);
+    this.emit('change', {
+      resourceType: this.type,
+      field: event.field,
+      oldValue: event.oldValue,
+      newValue: event.newValue
+    });
   };
 
   this.fields.forEach((field) => {

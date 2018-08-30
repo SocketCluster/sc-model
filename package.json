@@ -4,8 +4,8 @@
   "description": "SocketCluster model component for the front end",
   "main": "sc-model.js",
   "dependencies": {
-    "sc-json-stable-stringify": "^2.0.0",
-    "socketcluster-client-edge": "^13.0.2"
+    "sc-component-emitter": "^1.2.1",
+    "sc-json-stable-stringify": "^2.0.0"
   },
   "devDependencies": {},
   "scripts": {

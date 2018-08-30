@@ -1,6 +1,5 @@
 import jsonStableStringify from '/node_modules/sc-json-stable-stringify/sc-json-stable-stringify.js';
-import socketClusterClient from '/node_modules/socketcluster-client-edge/socketcluster.js';
-const Emitter = socketClusterClient.Emitter;
+import Emitter from '/node_modules/sc-component-emitter/sc-component-emitter.js';
 
 function SCField(options) {
   Emitter.call(this);
@@ -39,12 +38,25 @@ function SCField(options) {
   if (this.channel.state === 'subscribed') {
     this.loadData();
   }
+  this.channel.on('subscribeFail', (err) => {
+    this.emit('error', this._formatError(err));
+  });
   this.socket.on('authenticate', this.resubscribe);
 }
 
 SCField.prototype = Object.create(Emitter.prototype);
 
 SCField.Emitter = Emitter;
+
+SCField.prototype._formatError = function (error) {
+  if (error) {
+    if (error.message) {
+      return new Error(error.message);
+    }
+    return new Error(error);
+  }
+  return error;
+};
 
 SCField.prototype._triggerValueChange = function (oldValue, newValue) {
   this.emit('change', {
@@ -62,7 +74,7 @@ SCField.prototype.loadData = function () {
   };
   this.socket.emit('read', query, (err, result) => {
     if (err) {
-      this.emit('error', err);
+      this.emit('error', this._formatError(err));
     } else {
       let oldValue = this.value;
       this.value = result;
