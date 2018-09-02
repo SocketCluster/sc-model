@@ -1,5 +1,5 @@
-import jsonStableStringify from '/node_modules/sc-json-stable-stringify/sc-json-stable-stringify.js';
-import Emitter from '/node_modules/sc-component-emitter/sc-component-emitter.js';
+import jsonStableStringify from '../sc-json-stable-stringify/sc-json-stable-stringify.js';
+import Emitter from '../sc-component-emitter/sc-component-emitter.js';
 
 function SCField(options) {
   Emitter.call(this);
