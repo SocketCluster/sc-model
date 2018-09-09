@@ -25,7 +25,8 @@ function SCModel(options) {
     this.value[event.field] = event.newValue;
     this.emit('change', {
       resourceType: this.type,
-      field: event.field,
+      resourceId: this.id,
+      resourceField: event.field,
       oldValue: event.oldValue,
       newValue: event.newValue
     });
