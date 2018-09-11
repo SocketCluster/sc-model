@@ -39,9 +39,10 @@ function SCModel(options) {
       resourceId: this.id,
       name: field
     });
+    this.scFields[field] = scField;
+    this.value[field] = null;
     scField.on('error', this._handleSCFieldError);
     scField.on('change', this._handleSCFieldChange);
-    this.scFields[field] = scField;
   });
 }
 
