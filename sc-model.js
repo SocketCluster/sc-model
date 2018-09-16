@@ -17,8 +17,20 @@ function SCModel(options) {
     id: this.id
   };
 
+  this._triggerModelError = (err) => {
+    // Throw error in different stack frame so that error handling
+    // cannot interfere with a reconnect action.
+    setTimeout(() => {
+      if (this.listeners('error').length < 1) {
+        throw err;
+      } else {
+        this.emit('error', err);
+      }
+    }, 0);
+  };
+
   this._handleSCFieldError = (err) => {
-    this.emit('error', err);
+    this._triggerModelError(err);
   };
 
   this._handleSCFieldChange = (event) => {
