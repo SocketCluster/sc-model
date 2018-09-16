@@ -53,6 +53,7 @@ SCModel.Emitter = Emitter;
 SCModel.prototype.save = function () {
   let promises = [];
   Object.values(this.scFields).forEach((scField) => {
+    scField.value = this.value[scField.name];
     promises.push(scField.save());
   });
   return Promise.all(promises);
