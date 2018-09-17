@@ -41,7 +41,12 @@ function SCField(options) {
   this.channel.on('subscribeFail', (err) => {
     this.emit('error', this._formatError(err));
   });
-  this.socket.on('authenticate', this.resubscribe);
+
+  this._resubscribe = () => {
+    this.socket.subscribe(this.resourceChannelName);
+  };
+  
+  this.socket.on('authenticate', this._resubscribe);
 }
 
 SCField.prototype = Object.create(Emitter.prototype);
@@ -82,10 +87,6 @@ SCField.prototype.loadData = function () {
       this._triggerValueChange(oldValue, this.value);
     }
   });
-};
-
-SCField.prototype.resubscribe = function () {
-  this.socket.subscribe(this.resourceChannelName);
 };
 
 SCField.prototype.save = function () {
@@ -141,7 +142,7 @@ SCField.prototype.destroy = function () {
     return;
   }
   this.active = false;
-  this.socket.off('authenticate', this.resubscribe);
+  this.socket.off('authenticate', this._resubscribe);
   this.channel.unwatch(this._handleChannelData);
   if (!this.channel.watchers().length) {
     this.channel.destroy();
