@@ -1,6 +1,6 @@
 {
   "name": "sc-model",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "SocketCluster model component for the front end",
   "main": "sc-model.js",
   "dependencies": {
