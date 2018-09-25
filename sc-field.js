@@ -20,7 +20,6 @@ function SCField(options) {
       let oldValue = this.value;
       if (packet.type === 'delete') {
         this.value = null;
-        this.destroy();
       } else {
         this.value = packet.value;
       }
@@ -45,7 +44,7 @@ function SCField(options) {
   this._resubscribe = () => {
     this.socket.subscribe(this.resourceChannelName);
   };
-  
+
   this.socket.on('authenticate', this._resubscribe);
 }
 
